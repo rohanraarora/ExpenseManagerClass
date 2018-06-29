@@ -10,20 +10,29 @@ public class ExpensesOpenHelper extends SQLiteOpenHelper {
     public static final int VERSION = 1;
 
 
-    public ExpensesOpenHelper(Context context) {
+    private static ExpensesOpenHelper instance;
+
+    public static ExpensesOpenHelper getInstance(Context context){
+        if(instance == null){
+            instance = new ExpensesOpenHelper(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+
+    private ExpensesOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
         String expensesSql = "CREATE TABLE " + Contract.Expense.TABLE_NAME  + " (  " +
                 Contract.Expense.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
                 Contract.Expense.COLUMN_NAME  + " TEXT , " +
                 Contract.Expense.COLUMN_AMOUNT + " INTEGER )";
+
+
         sqLiteDatabase.execSQL(expensesSql);
-
-
     }
 
     @Override

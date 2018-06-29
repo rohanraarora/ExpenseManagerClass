@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
+
+
     ArrayList<Expense> expenses = new ArrayList<>();
     ExpenseAdapter adapter;
 
@@ -35,16 +37,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listView = findViewById(R.id.listview);
 
-        ExpensesOpenHelper openHelper = new ExpensesOpenHelper(this);
+        ExpensesOpenHelper openHelper = ExpensesOpenHelper.getInstance(getApplicationContext());
         SQLiteDatabase database = openHelper.getReadableDatabase();
-        Cursor cursor = database.query(Contract.Expense.TABLE_NAME,null,null,null,null,null,null);
+        int amountGreaterThan = 0;
+        String[] selectionArgument = {amountGreaterThan + "",};
+        String[] columns = {Contract.Expense.COLUMN_NAME,Contract.Expense.COLUMN_AMOUNT,Contract.Expense.COLUMN_ID};
+        Cursor cursor = database.query(Contract.Expense.TABLE_NAME,columns,  "amount > ?",selectionArgument,null,null,null);
         while(cursor.moveToNext()){
             String name = cursor.getString(cursor.getColumnIndex(Contract.Expense.COLUMN_NAME));
             int amount = cursor.getInt(cursor.getColumnIndex(Contract.Expense.COLUMN_AMOUNT));
-
+            long id = cursor.getLong(cursor.getColumnIndex(Contract.Expense.COLUMN_ID));
             Expense expense = new Expense(name,amount);
+            expense.setId(id);
             expenses.add(expense);
         }
+        cursor.close();
 
 
 //
@@ -71,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Expense expense = expenses.get(i);
+        final Expense expense = expenses.get(i);
 
 
         final int position = i;
@@ -85,6 +92,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 //Toast.makeText(MainActivity.this,"Ok Presses",Toast.LENGTH_LONG).show();
+                ExpensesOpenHelper openHelper = ExpensesOpenHelper.getInstance(getApplicationContext());
+                SQLiteDatabase database = openHelper.getWritableDatabase();
+
+                long id = expense.getId();
+                String[] selectionArgs = {id + ""};
+
+                database.delete(Contract.Expense.TABLE_NAME,Contract.Expense.COLUMN_ID + " = ?",selectionArgs);
+
+
                 expenses.remove(position);
                 adapter.notifyDataSetChanged();
             }
@@ -138,18 +154,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int amount = Integer.parseInt(amountString);
                 Expense expense = new Expense(title,amount);
 
-                ExpensesOpenHelper openHelper = new ExpensesOpenHelper(this);
+                ExpensesOpenHelper openHelper = ExpensesOpenHelper.getInstance(this);
                 SQLiteDatabase database = openHelper.getWritableDatabase();
 
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(Contract.Expense.COLUMN_NAME,expense.getName());
                 contentValues.put(Contract.Expense.COLUMN_AMOUNT,expense.getAmount());
 
-                database.insert(Contract.Expense.TABLE_NAME,null,contentValues);
+                long id = database.insert(Contract.Expense.TABLE_NAME,null,contentValues);
+                if (id > -1L){
+                    expense.setId(id);
 
+                    expenses.add(expense);
+                    adapter.notifyDataSetChanged();
+                }
 
-                expenses.add(expense);
-                adapter.notifyDataSetChanged();
             }
         }
 
