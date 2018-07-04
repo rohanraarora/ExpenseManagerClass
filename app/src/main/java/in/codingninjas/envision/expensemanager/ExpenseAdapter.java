@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,15 @@ public class ExpenseAdapter extends ArrayAdapter {
 
     ArrayList<Expense> items;
     LayoutInflater inflater;
+    Context context;
+    ExpenseItemClickListener clickListener;
 
-    public ExpenseAdapter(@NonNull Context context, ArrayList<Expense> items) {
+    public ExpenseAdapter(@NonNull Context context, ArrayList<Expense> items,ExpenseItemClickListener listener) {
         super(context, 0,  items);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.context = context;
         this.items = items;
+        this.clickListener = listener;
     }
 
     @Override
@@ -35,10 +41,19 @@ public class ExpenseAdapter extends ArrayAdapter {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View output = inflater.inflate(R.layout.expense_row_layout,parent,false);
         TextView nameTextView = output.findViewById(R.id.expenseName);
         TextView amountTextView = output.findViewById(R.id.expenseAmount);
+        Button button = output.findViewById(R.id.deleteButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+              clickListener.rowButtonClicked(view,position);
+
+            }
+        });
         Expense expense = items.get(position);
         nameTextView.setText(expense.getName());
         amountTextView.setText(expense.getAmount() + "Rs");

@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,ExpenseItemClickListener {
 
     ArrayList<Expense> expenses = new ArrayList<>();
     ExpenseAdapter adapter;
@@ -35,7 +35,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //ArrayAdapter<String> adapter = new ArrayAdapter<>(this,R.layout.expense_row_layout,R.id.expenseName,expenses);
 
-        adapter = new ExpenseAdapter(this,expenses);
+        adapter = new ExpenseAdapter(getApplicationContext(), expenses, new ExpenseItemClickListener() {
+            @Override
+            public void rowButtonClicked(View view, int position) {
+
+            }
+        });
 
         listView.setAdapter(adapter);
 
@@ -80,5 +85,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //
 
         //Toast.makeText(this,expense.getName() + " " + expense.getAmount(),Toast.LENGTH_LONG).show();
+    }
+
+
+    public void rowButtonClicked(View view,int position){
+        Toast.makeText(this,"Buttom Pressed " + position,Toast.LENGTH_LONG).show();
     }
 }
