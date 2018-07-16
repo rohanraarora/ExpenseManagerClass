@@ -16,12 +16,12 @@ import java.util.List;
 
 public class ExpenseAdapter extends ArrayAdapter {
 
-    ArrayList<Expense> items;
+    List<Expense> items;
     LayoutInflater inflater;
     Context context;
     ExpenseItemClickListener clickListener;
 
-    public ExpenseAdapter(@NonNull Context context, ArrayList<Expense> items,ExpenseItemClickListener listener) {
+    public ExpenseAdapter(@NonNull Context context, List<Expense> items,ExpenseItemClickListener listener) {
         super(context, 0,  items);
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.context = context;

@@ -1,5 +1,6 @@
 package in.codingninjas.envision.expensemanager;
 
+import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,11 +15,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,ExpenseItemClickListener, AdapterView.OnItemLongClickListener {
 
-    ArrayList<Expense> expenses = new ArrayList<>();
+    List<Expense> expenses = new ArrayList<>();
     ExpenseAdapter adapter;
+    ExpenseDAO expenseDAO;
 
 
     @Override
@@ -28,13 +31,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         ListView listView = findViewById(R.id.listview);
 
-
-        for(int i = 0;i<20;i++){
-
-            Expense expense = new Expense("Expense " + i,i*100);
-            expenses.add(expense);
-
-        }
+        ExpenseDatabase database = Room.databaseBuilder(getApplicationContext(),ExpenseDatabase.class,"expenses_db").allowMainThreadQueries().build();
+        expenseDAO = database.getExpenseDao();
+        expenses = expenseDAO.getExpenses();
 
         //ArrayAdapter<String> adapter = new ArrayAdapter<>(this,R.layout.expense_row_layout,R.id.expenseName,expenses);
 
@@ -72,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+
+
 
                 //Toast.makeText(MainActivity.this,"Ok Presses",Toast.LENGTH_LONG).show();
                 expenses.remove(position);
@@ -129,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 expenseAmount = expenseAmountEditText.getText().toString();
 
                 Expense expense = new Expense(expenseTitle,Integer.parseInt(expenseAmount));
+                expenseDAO.addExpenses(expense);
+
                 expenses.add(expense);
                 adapter.notifyDataSetChanged();
             }
