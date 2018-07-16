@@ -2,8 +2,13 @@ package in.codingninjas.envision.expensemanager;
 
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.graphics.Bitmap;
+
+import java.util.List;
 
 @Entity(tableName = "expenses")
 public class Expense {
@@ -14,6 +19,11 @@ public class Expense {
     @ColumnInfo(name = "expense_name")
     private String name;
     private int amount;
+
+    @Ignore
+    Bitmap bitmap;
+
+    //List<Comment> comments;
 
     public Expense(int id,String name,int amount){
         this.name = name;
