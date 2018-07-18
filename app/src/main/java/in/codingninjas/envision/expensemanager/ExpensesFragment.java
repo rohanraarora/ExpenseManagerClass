@@ -2,15 +2,21 @@ package in.codingninjas.envision.expensemanager;
 
 
 import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -24,20 +30,92 @@ public class ExpensesFragment extends Fragment implements AdapterView.OnItemClic
     List<Expense> expenses = new ArrayList<>();
     ExpenseAdapter adapter;
     ExpenseDAO expenseDAO;
+    ListView listView;
+
+    ExpensesFragmentCallback listener;
 
 
     public ExpensesFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof ExpensesFragmentCallback){
+            listener = (ExpensesFragmentCallback) context;
+        }
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.main_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId() == R.id.addExpense){
+
+            addExpense();
+        }
+
+        return true;
+    }
+
+    private void addExpense() {
+
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.add_expense_dialog_layout,null);
+        builder.setView(dialogView);
+
+        final EditText expenseTitleEditText = dialogView.findViewById(R.id.expenseTitleEditText);
+        final EditText expenseAmountEditText = dialogView.findViewById(R.id.expenseAmountTitleEditText);
+
+        builder.setTitle("Add Expense");
+        builder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                String expenseTitle,expenseAmount;
+
+                expenseTitle = expenseTitleEditText.getText().toString();
+                expenseAmount = expenseAmountEditText.getText().toString();
+
+                Expense expense = new Expense(expenseTitle,Integer.parseInt(expenseAmount));
+                expenseDAO.addExpenses(expense);
+
+                expenses.add(expense);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create().show();
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View output = inflater.inflate(R.layout.fragment_expenses, container, false);
 
+
         // Inflate the layout for this fragment
-        ListView listView = output.findViewById(R.id.listview);
+        listView = output.findViewById(R.id.listview);
 
         ExpenseDatabase database = Room.databaseBuilder(getContext().getApplicationContext(),ExpenseDatabase.class,"expenses_db").allowMainThreadQueries().build();
         expenseDAO = database.getExpenseDao();
@@ -64,16 +142,12 @@ public class ExpensesFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        //Toast.makeText(this,expense.getName() + " " + expense.getAmount(),Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(getContext(),DetailActivity.class);
+        listView.setItemChecked(i,true);
         Expense expense = expenses.get(i);
-        Bundle bundle = new Bundle();
-        bundle.putString("name",expense.getName());
-        bundle.putInt("amount",expense.getAmount());
-        bundle.putInt("id",expense.getId());
+        if(listener != null){
+            listener.onExpenseSelected(expense);
+        }
 
-        intent.putExtras(bundle);
-        startActivity(intent);
     }
 
     @Override
@@ -108,6 +182,13 @@ public class ExpensesFragment extends Fragment implements AdapterView.OnItemClic
         dialog.show();
 
         return true;
+    }
+
+
+    public interface ExpensesFragmentCallback {
+
+        void onExpenseSelected(Expense expense);
+
     }
 
 
