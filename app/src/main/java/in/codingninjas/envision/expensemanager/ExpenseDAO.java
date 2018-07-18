@@ -41,7 +41,7 @@ public interface ExpenseDAO {
     @Query("select commentId from expenses_comments where expenseId = :expenseId")
     int[] getCommentIdsForExpense(int expenseId);
 
-    @Query("select * from comment where id in :ids")
+    @Query("select * from comment where id in (:ids)")
     List<Comment> getCommentsFromIds(int[] ids);
 
 }

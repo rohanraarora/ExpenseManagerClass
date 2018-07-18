@@ -25,6 +25,7 @@ public class Expense {
 
     //List<Comment> comments;
 
+    @Ignore
     public Expense(int id,String name,int amount){
         this.name = name;
         this.amount = amount;

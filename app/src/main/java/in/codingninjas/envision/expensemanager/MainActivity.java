@@ -2,6 +2,7 @@ package in.codingninjas.envision.expensemanager;
 
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,11 +18,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener,ExpenseItemClickListener, AdapterView.OnItemLongClickListener {
+public class MainActivity extends AppCompatActivity  {
 
-    List<Expense> expenses = new ArrayList<>();
-    ExpenseAdapter adapter;
-    ExpenseDAO expenseDAO;
+
 
 
     @Override
@@ -29,68 +28,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView listView = findViewById(R.id.listview);
 
-        ExpenseDatabase database = Room.databaseBuilder(getApplicationContext(),ExpenseDatabase.class,"expenses_db").allowMainThreadQueries().build();
-        expenseDAO = database.getExpenseDao();
-        expenses = expenseDAO.getExpenses();
-
-        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this,R.layout.expense_row_layout,R.id.expenseName,expenses);
-
-        adapter = new ExpenseAdapter(getApplicationContext(), expenses, new ExpenseItemClickListener() {
-            @Override
-            public void rowButtonClicked(View view, int position) {
-
-            }
-        });
-
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(this);
-        listView.setOnItemLongClickListener(this);
 
         View view = new View(this);
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-        //Toast.makeText(this,expense.getName() + " " + expense.getAmount(),Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-        Expense expense = expenses.get(i);
-        final int position = i;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirm Delete");
-        builder.setCancelable(false);
-        builder.setMessage("Do you really want to delete " + expense.getName() + "?");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-
-
-                //Toast.makeText(MainActivity.this,"Ok Presses",Toast.LENGTH_LONG).show();
-                expenses.remove(position);
-                adapter.notifyDataSetChanged();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        return true;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,16 +66,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                String expenseTitle,expenseAmount;
-
-                expenseTitle = expenseTitleEditText.getText().toString();
-                expenseAmount = expenseAmountEditText.getText().toString();
-
-                Expense expense = new Expense(expenseTitle,Integer.parseInt(expenseAmount));
-                expenseDAO.addExpenses(expense);
-
-                expenses.add(expense);
-                adapter.notifyDataSetChanged();
+//                String expenseTitle,expenseAmount;
+//
+//                expenseTitle = expenseTitleEditText.getText().toString();
+//                expenseAmount = expenseAmountEditText.getText().toString();
+//
+//                Expense expense = new Expense(expenseTitle,Integer.parseInt(expenseAmount));
+//                expenseDAO.addExpenses(expense);
+//
+//                expenses.add(expense);
+//                adapter.notifyDataSetChanged();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
