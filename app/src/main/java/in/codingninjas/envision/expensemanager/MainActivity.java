@@ -68,4 +68,12 @@ public class MainActivity extends AppCompatActivity implements ExpensesFragment.
         }
 
     }
+
+
+    public void removeAll(View view){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        ExpensesFragment fragment = (ExpensesFragment) fragmentManager.findFragmentById(R.id.fragment);
+        fragment.remove();
+    }
+
 }

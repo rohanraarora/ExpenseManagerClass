@@ -41,6 +41,7 @@ public class ExpensesFragment extends Fragment implements AdapterView.OnItemClic
 
     @Override
     public void onAttach(Context context) {
+
         super.onAttach(context);
         if(context instanceof ExpensesFragmentCallback){
             listener = (ExpensesFragmentCallback) context;
@@ -182,6 +183,11 @@ public class ExpensesFragment extends Fragment implements AdapterView.OnItemClic
         dialog.show();
 
         return true;
+    }
+
+    public void remove(){
+        expenses.clear();
+        adapter.notifyDataSetChanged();
     }
 
 
